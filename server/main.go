@@ -1,13 +1,15 @@
 package main
 
 import (
-  "context"
-  // pb "github.com/katsuyukishimbo/gRPC/protobuf"
-  "../protobuf"
-	"google.golang.org/grpc"
+	"context"
+	// pb "github.com/katsuyukishimbo/gRPC/protobuf"
+	"flag"
 	"log"
-  "net"
-  "flag"
+	"net"
+
+	greeter "../protobuf"
+	_ "github.com/go-sql-driver/mysql"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -17,20 +19,20 @@ var (
 type server struct{}
 
 func (s *server) SayHello(ctx context.Context, req *greeter.HelloRequest) (*greeter.HelloReply, error) {
-  greet := &greeter.HelloReply{
-    Message: "Hello " + req.Name + "!",
-  }
-  return greet, nil
+	greet := &greeter.HelloReply{
+		Message: "Hello " + req.Name + "!",
+	}
+	return greet, nil
 }
 
 func main() {
-    listener, err := net.Listen("tcp", *addrFlag)
-    if err != nil {
-        log.Fatalf("failed to listen: %v\n", err)
-        return
-    }
-    grpcSrv := grpc.NewServer()
-    greeter.RegisterGreeterServer(grpcSrv, &server{})
-    log.Printf("service is running!")
-    grpcSrv.Serve(listener)
+	listener, err := net.Listen("tcp", *addrFlag)
+	if err != nil {
+		log.Fatalf("failed to listen: %v\n", err)
+		return
+	}
+	grpcSrv := grpc.NewServer()
+	greeter.RegisterGreeterServer(grpcSrv, &server{})
+	log.Printf("service is running!")
+	grpcSrv.Serve(listener)
 }
